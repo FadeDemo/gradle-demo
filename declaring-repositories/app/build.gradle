@@ -12,8 +12,22 @@ plugins {
 }
 
 repositories {
+    // 有关的api都在RepositoryHandler中
+    // 当定义多个仓库时，仓库声明的顺序将会决定gradle如何解决依赖
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+    // Use Google Maven for resolving dependencies
+//    google()
+    // declare a repository by URL
+//    maven {
+//        url "https://repo.spring.io/release"
+//    }
+    // flat directory repository
+    // 此种仓库不支持元数据形式的文件
+    // 而且优先级比支持元数据的仓库低
+    flatDir {
+        dirs 'lib'
+    }
 }
 
 dependencies {
@@ -22,6 +36,9 @@ dependencies {
 
     // Use JUnit Jupiter Engine for testing.
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    // when use flat directory repository
+    // fixme can not run test
+//    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:29.0-jre'
