@@ -15,19 +15,72 @@ repositories {
     // 有关的api都在RepositoryHandler中
     // 当定义多个仓库时，仓库声明的顺序将会决定gradle如何解决依赖
     // Use Maven Central for resolving dependencies.
-    mavenCentral()
+//    mavenCentral()
     // Use Google Maven for resolving dependencies
 //    google()
     // declare a repository by URL
 //    maven {
 //        url "https://repo.spring.io/release"
+//        // 当一些artifact不能在上面的位置找到时，可以到下面的仓库去寻找
+////        artifactUrls "http://repo.mycompany.com/jars", "http://repo.mycompany.com/jars2"
 //    }
     // flat directory repository
     // 此种仓库不支持元数据形式的文件
     // 而且优先级比支持元数据的仓库低
-    flatDir {
-        dirs 'lib'
+//    flatDir {
+//        dirs 'lib'
+//    }
+    // 本地Maven仓库
+    // 会依次寻找 USER_HOME/.m2（默认使用） -> M2_HOME/conf 里的setting.xml
+    // 貌似是如果在上面的过程中找到了依赖，则使用本地仓库的依赖，否则去远程仓库下载或者报错
+    // 建议是尽量少地使用mavenLocal
+//    mavenLocal()
+
+    // 过滤仓库内容
+    // 下面这种过滤不是排他性的、
+    // 即一个仓库声明排除了某个group不代表另一个仓库不能包含这个group
+    maven {
+        url "https://repo.spring.io/release"
+        content {
+            includeGroup "org.springframework"
+        }
     }
+    mavenCentral {
+        content {
+            excludeGroup "org.springframework"
+        }
+        // 过滤maven仓库
+        mavenContent {
+            releasesOnly()
+//            snapshotsOnly()
+        }
+        // 配置元数据源
+        metadataSources {
+            // 优先级是 gradleMetadata() -> mavenPom() -> artifact()
+            mavenPom()
+//            artifact()
+        }
+    }
+    // 排他性过滤仓库内容
+    exclusiveContent {
+        forRepository {
+            maven {
+                url "https://repo.spring.io/release"
+            }
+        }
+        filter {
+            includeGroup "org.springframework"
+        }
+    }
+//    maven {
+//        url "sftp://repo.mycompany.com:22/maven2"
+//        // 但是理论上说认证信息不应该存储在这（安全起见）
+//        // 声明认证信息
+//        credentials {
+//            username "user"
+//            password "password"
+//        }
+//    }
 }
 
 dependencies {
